@@ -93,16 +93,17 @@ export const Navbar = () => {
         </NavbarItem>
         {/* <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem> */}
         <NavbarItem className="hidden md:flex">
-          <Button
-            isExternal
-            as={Link}
-            className="text-sm font-bold text-default-600 bg-default-100"
-            href={siteConfig.links.sponsor}
-            // startContent={<HeartFilledIcon className="text-danger" />}
-            variant="flat"
-          >
-            LOGIN
-          </Button>
+        <Button
+  isExternal
+  as={Link}
+  className="text-sm font-bold text-default-600 bg-default-100"
+  href="/register"
+  // startContent={<HeartFilledIcon className="text-danger" />}
+  variant="flat"
+>
+  REGISTER
+</Button>
+
         </NavbarItem>
       </NavbarContent>
 
