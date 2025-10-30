@@ -93,10 +93,14 @@ const RegisterPage = () => {
               initial={{ x: -50, opacity: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <label className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="firstName"
+                className="block text-sm font-medium text-gray-700"
+              >
                 First Name
               </label>
               <input
+                id="firstName"
                 required
                 className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 type="text"
@@ -110,10 +114,14 @@ const RegisterPage = () => {
               initial={{ x: -50, opacity: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <label className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="lastName"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Last Name
               </label>
               <input
+                id="lastName"
                 required
                 className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 type="text"
@@ -123,10 +131,14 @@ const RegisterPage = () => {
             </motion.div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="gender"
+              className="block text-sm font-medium text-gray-700"
+            >
               Gender
             </label>
             <select
+              id="gender"
               required
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={gender}
@@ -139,10 +151,14 @@ const RegisterPage = () => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
               Email
             </label>
             <input
+              id="email"
               required
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               type="email"
@@ -151,10 +167,14 @@ const RegisterPage = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
               Password
             </label>
             <input
+              id="password"
               required
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               type="password"
@@ -163,10 +183,14 @@ const RegisterPage = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="confirmPassword"
+              className="block text-sm font-medium text-gray-700"
+            >
               Confirm Password
             </label>
             <input
+              id="confirmPassword"
               required
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               type="password"
