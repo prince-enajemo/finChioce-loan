@@ -3,11 +3,11 @@
 import { motion } from "framer-motion";
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
 } from "firebase/auth";
+
 import { auth } from "@/firebase/firebase";
 
 const RegisterPage = () => {
@@ -28,6 +28,7 @@ const RegisterPage = () => {
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
+
       return;
     }
 
@@ -84,40 +85,40 @@ const RegisterPage = () => {
         {message && (
           <p className="text-green-500 text-center mb-4">{message}</p>
         )}
-        <form onSubmit={handleRegister} className="space-y-6">
+        <form className="space-y-6" onSubmit={handleRegister}>
           <div className="flex space-x-4">
             <motion.div
+              animate={{ x: 0, opacity: 1 }}
               className="flex-1"
               initial={{ x: -50, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.1 }}
             >
               <label className="block text-sm font-medium text-gray-700">
                 First Name
               </label>
               <input
+                required
+                className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 type="text"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
               />
             </motion.div>
             <motion.div
+              animate={{ x: 0, opacity: 1 }}
               className="flex-1"
               initial={{ x: -50, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
               <label className="block text-sm font-medium text-gray-700">
                 Last Name
               </label>
               <input
+                required
+                className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 type="text"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
               />
             </motion.div>
           </div>
@@ -126,10 +127,10 @@ const RegisterPage = () => {
               Gender
             </label>
             <select
+              required
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={gender}
               onChange={(e) => setGender(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
             >
               <option value="">Select Gender</option>
               <option value="male">Male</option>
@@ -142,11 +143,11 @@ const RegisterPage = () => {
               Email
             </label>
             <input
+              required
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
             />
           </div>
           <div>
@@ -154,11 +155,11 @@ const RegisterPage = () => {
               Password
             </label>
             <input
+              required
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
             />
           </div>
           <div>
@@ -166,16 +167,16 @@ const RegisterPage = () => {
               Confirm Password
             </label>
             <input
+              required
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
             />
           </div>
           <button
-            type="submit"
             className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            type="submit"
           >
             Register
           </button>

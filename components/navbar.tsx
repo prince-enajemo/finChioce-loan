@@ -17,11 +17,7 @@ import clsx from "clsx";
 
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
-import {
-  
-  SearchIcon,
-  Logo,
-} from "@/components/icons";
+import { SearchIcon, Logo } from "@/components/icons";
 
 export const Navbar = () => {
   const searchInput = (
