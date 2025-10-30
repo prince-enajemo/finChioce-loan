@@ -10,7 +10,7 @@ import {
 } from "firebase/auth";
 import { auth } from "@/firebase/firebase";
 
-const registerPage = () => {
+const RegisterPage = () => {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [gender, setGender] = useState("");
@@ -159,4 +159,4 @@ const registerPage = () => {
     );
 };
 
-export default registerPage;
+export default RegisterPage;
