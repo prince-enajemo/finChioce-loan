@@ -15,29 +15,65 @@ import { Kbd } from "@heroui/kbd";
 import { Link } from "@heroui/link";
 import { Input } from "@heroui/input";
 import { link as linkStyles } from "@heroui/theme";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+} from "@heroui/dropdown";
 import NextLink from "next/link";
 import clsx from "clsx";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { SearchIcon, Logo } from "@/components/icons";
-
-// ✅ Firebase imports
-import { app } from "@/firebase/firebase"; // adjust if your firebase file is in another path
+import { firestore, app } from "@/firebase/firebase";
 
 export const Navbar = () => {
   const [user, setUser] = useState<any>(null);
+  const [firstName, setFirstName] = useState<string | null>(null);
+  const router = useRouter();
 
-  // ✅ Watch Firebase auth state
   useEffect(() => {
     const auth = getAuth(app);
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+
+    // Listen for auth changes
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+
+      if (currentUser) {
+        try {
+          const userDocRef = doc(firestore, "users", currentUser.uid);
+          const userDoc = await getDoc(userDocRef);
+
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+
+            setFirstName(userData.firstName || null);
+          } else {
+            setFirstName(null);
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          setFirstName(null);
+        }
+      } else {
+        setFirstName(null);
+      }
     });
 
     return () => unsubscribe();
   }, []);
+
+  const handleLogout = async () => {
+    const auth = getAuth(app);
+
+    await signOut(auth);
+    router.push("/"); // Redirect to home after logout
+  };
 
   const searchInput = (
     <Input
@@ -62,7 +98,7 @@ export const Navbar = () => {
 
   return (
     <HeroUINavbar maxWidth="xl" position="sticky">
-      {/* ===== Left Side ===== */}
+      {/* Left side */}
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
@@ -91,7 +127,7 @@ export const Navbar = () => {
         </ul>
       </NavbarContent>
 
-      {/* ===== Right Side ===== */}
+      {/* Right side (desktop) */}
       <NavbarContent
         className="hidden sm:flex basis-1/5 sm:basis-full"
         justify="end"
@@ -102,17 +138,30 @@ export const Navbar = () => {
 
         <NavbarItem className="hidden md:flex">
           {user ? (
-            // ✅ If user is logged in
-            <Button
-              as={Link}
-              className="text-sm font-bold text-default-600 bg-default-100"
-              href="/dashboard"
-              variant="flat"
-            >
-              Hi, {user.displayName || "User"}
-            </Button>
+            <Dropdown placement="bottom-end">
+              <DropdownTrigger>
+                <Button
+                  className="text-sm font-bold text-default-600 bg-default-100"
+                  variant="flat"
+                >
+                  Hi,{" "}
+                  {firstName || user.displayName || user.email?.split("@")[0]} ▾
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu aria-label="User menu">
+                <DropdownItem key="profile">
+                  <NextLink href="/dashboard">Profile</NextLink>
+                </DropdownItem>
+                <DropdownItem
+                  key="logout"
+                  color="danger"
+                  onPress={handleLogout}
+                >
+                  Logout
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
           ) : (
-            // 🚀 Default: show register button
             <Button
               as={Link}
               className="text-sm font-bold text-default-600 bg-default-100"
@@ -125,13 +174,12 @@ export const Navbar = () => {
         </NavbarItem>
       </NavbarContent>
 
-      {/* ===== Mobile ===== */}
+      {/* Mobile */}
       <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
         <ThemeSwitch />
         <NavbarMenuToggle />
       </NavbarContent>
 
-      {/* ===== Mobile Menu ===== */}
       <NavbarMenu>
         {searchInput}
         <div className="mx-4 mt-2 flex flex-col gap-2">
@@ -152,6 +200,19 @@ export const Navbar = () => {
               </Link>
             </NavbarMenuItem>
           ))}
+
+          {user && (
+            <NavbarMenuItem>
+              <Button
+                className="w-full"
+                color="danger"
+                variant="flat"
+                onPress={handleLogout}
+              >
+                Logout
+              </Button>
+            </NavbarMenuItem>
+          )}
         </div>
       </NavbarMenu>
     </HeroUINavbar>

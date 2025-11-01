@@ -11,8 +11,11 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import Link from "next/link";
 
 import { auth, firestore } from "@/firebase/firebase";
+import useAuthRedirect from "@/hooks/useAuthRedirect";
 
 const LoginPage = () => {
+  useAuthRedirect();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -106,7 +109,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="bg-gradient-to-b from-gray-600 to-black flex justify-center items-center h-screen w-full overflow-hidden">
+    <div className="bg-gradient-to-b from-gray-600 to-black flex justify-center items-center h-screen w-screen">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
           Login

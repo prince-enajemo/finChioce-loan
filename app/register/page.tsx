@@ -1,220 +1,247 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-  Navbar as HeroUINavbar,
-  NavbarContent,
-  NavbarMenu,
-  NavbarMenuToggle,
-  NavbarBrand,
-  NavbarItem,
-  NavbarMenuItem,
-} from "@heroui/navbar";
-import { Button } from "@heroui/button";
-import { Kbd } from "@heroui/kbd";
-import { Link } from "@heroui/link";
-import { Input } from "@heroui/input";
-import { link as linkStyles } from "@heroui/theme";
-import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-} from "@heroui/dropdown";
-import NextLink from "next/link";
-import clsx from "clsx";
+import { motion } from "framer-motion";
+import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
 
-import { siteConfig } from "@/config/site";
-import { ThemeSwitch } from "@/components/theme-switch";
-import { SearchIcon, Logo } from "@/components/icons";
-import { firestore, app } from "@/firebase/firebase";
+import { auth } from "@/firebase/firebase";
 
-export const Navbar = () => {
-  const [user, setUser] = useState<any>(null);
-  const [firstName, setFirstName] = useState<string | null>(null);
+const RegisterPage = () => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [gender, setGender] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    const auth = getAuth(app);
+  const handleRegister = async (event: FormEvent) => {
+    event.preventDefault();
+    setError(null);
+    setMessage(null);
 
-    // Listen for auth changes
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
 
-      if (currentUser) {
-        try {
-          const userDocRef = doc(firestore, "users", currentUser.uid);
-          const userDoc = await getDoc(userDocRef);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
 
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
+      await sendEmailVerification(user);
 
-            setFirstName(userData.firstName || null);
-          } else {
-            setFirstName(null);
-          }
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-          setFirstName(null);
+      // Temporarily store user data in local storage
+      localStorage.setItem(
+        "registrationData",
+        JSON.stringify({
+          firstName,
+          lastName,
+          gender,
+          email,
+          password,
+          confirmPassword,
+        })
+      );
+
+      setMessage(
+        "Registration successful! Please check your email for verification."
+      );
+
+      // Clear form fields
+      setFirstName("");
+      setLastName("");
+      setGender("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+    } catch (error) {
+      if (error instanceof Error) {
+        const errorMessage = error.message;
+        if (errorMessage.includes("email-already-in-use")) {
+          setError("This email is already in use. Please use a different email.");
+        } else if (errorMessage.includes("weak-password")) {
+          setError("Your password is too weak. Please use a stronger password.");
+        } else if (errorMessage.includes("invalid-email")) {
+          setError("The email address is invalid. Please enter a valid email.");
+        } else {
+          setError("An error occurred during registration. Please try again.");
         }
       } else {
-        setFirstName(null);
+        setError("An unknown error occurred");
       }
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  const handleLogout = async () => {
-    const auth = getAuth(app);
-
-    await signOut(auth);
-    router.push("/"); // Redirect to home after logout
+    }
   };
 
-  const searchInput = (
-    <Input
-      aria-label="Search"
-      classNames={{
-        inputWrapper: "bg-default-100",
-        input: "text-sm",
-      }}
-      endContent={
-        <Kbd className="hidden lg:inline-block" keys={["command"]}>
-          K
-        </Kbd>
+  const handleGoogleSignIn = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Optionally, you can store user data or navigate to another page
+      setMessage(`Welcome ${user.displayName}!`);
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("An unknown error occurred during Google Sign-In");
       }
-      labelPlacement="outside"
-      placeholder="Search..."
-      startContent={
-        <SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0" />
-      }
-      type="search"
-    />
-  );
+    }
+  };
 
   return (
-    <HeroUINavbar maxWidth="xl" position="sticky">
-      {/* Left side */}
-      <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
-        <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink className="flex justify-start items-center gap-1" href="/">
-            <Logo />
-            <p className="font-bold text-inherit">
-              <span className="text-blue-500">FIN</span>CHIOCE
-            </p>
-          </NextLink>
-        </NavbarBrand>
-
-        <ul className="hidden lg:flex gap-4 justify-start ml-2">
-          {siteConfig.navItems.map((item) => (
-            <NavbarItem key={item.href}>
-              <NextLink
-                className={clsx(
-                  linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium",
-                )}
-                color="foreground"
-                href={item.href}
-              >
-                {item.label}
-              </NextLink>
-            </NavbarItem>
-          ))}
-        </ul>
-      </NavbarContent>
-
-      {/* Right side (desktop) */}
-      <NavbarContent
-        className="hidden sm:flex basis-1/5 sm:basis-full"
-        justify="end"
-      >
-        <NavbarItem className="hidden sm:flex gap-2">
-          <ThemeSwitch />
-        </NavbarItem>
-
-        <NavbarItem className="hidden md:flex">
-          {user ? (
-            <Dropdown placement="bottom-end">
-              <DropdownTrigger>
-                <Button
-                  className="text-sm font-bold text-default-600 bg-default-100"
-                  variant="flat"
-                >
-                  Hi,{" "}
-                  {firstName || user.displayName || user.email?.split("@")[0]} ▾
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu aria-label="User menu">
-                <DropdownItem key="profile">
-                  <NextLink href="/dashboard">Profile</NextLink>
-                </DropdownItem>
-                <DropdownItem
-                  key="logout"
-                  color="danger"
-                  onPress={handleLogout}
-                >
-                  Logout
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          ) : (
-            <Button
-              as={Link}
-              className="text-sm font-bold text-default-600 bg-default-100"
-              href="/register"
-              variant="flat"
+    <div className="bg-gradient-to-b from-gray-600 to-black flex justify-center items-center min-h-screen w-full overflow-hidden">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
+          Create an Account
+        </h2>
+        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+        {message && (
+          <p className="text-green-500 text-center mb-4">{message}</p>
+        )}
+        <form className="space-y-6" onSubmit={handleRegister}>
+          <div className="flex space-x-4">
+            <motion.div
+              animate={{ x: 0, opacity: 1 }}
+              className="flex-1"
+              initial={{ x: -50, opacity: 0 }}
+              transition={{ delay: 0.1 }}
             >
-              REGISTER
-            </Button>
-          )}
-        </NavbarItem>
-      </NavbarContent>
-
-      {/* Mobile */}
-      <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
-        <ThemeSwitch />
-        <NavbarMenuToggle />
-      </NavbarContent>
-
-      <NavbarMenu>
-        {searchInput}
-        <div className="mx-4 mt-2 flex flex-col gap-2">
-          {siteConfig.navMenuItems.map((item, index) => (
-            <NavbarMenuItem key={`${item}-${index}`}>
-              <Link
-                color={
-                  index === 2
-                    ? "primary"
-                    : index === siteConfig.navMenuItems.length - 1
-                      ? "danger"
-                      : "foreground"
-                }
-                href={item.href}
-                size="lg"
+              <label
+                htmlFor="firstName"
+                className="block text-sm font-medium text-gray-700"
               >
-                {item.label}
-              </Link>
-            </NavbarMenuItem>
-          ))}
-
-          {user && (
-            <NavbarMenuItem>
-              <Button
-                className="w-full"
-                color="danger"
-                variant="flat"
-                onPress={handleLogout}
+                First Name
+              </label>
+              <input
+                id="firstName"
+                required
+                className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
+            </motion.div>
+            <motion.div
+              animate={{ x: 0, opacity: 1 }}
+              className="flex-1"
+              initial={{ x: -50, opacity: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <label
+                htmlFor="lastName"
+                className="block text-sm font-medium text-gray-700"
               >
-                Logout
-              </Button>
-            </NavbarMenuItem>
-          )}
-        </div>
-      </NavbarMenu>
-    </HeroUINavbar>
+                Last Name
+              </label>
+              <input
+                id="lastName"
+                required
+                className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
+            </motion.div>
+          </div>
+          <div>
+            <label
+              htmlFor="gender"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Gender
+            </label>
+            <select
+              id="gender"
+              required
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+            >
+              <option value="">Select Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Email
+            </label>
+            <input
+              id="email"
+              required
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Password
+            </label>
+            <input
+              id="password"
+              required
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="confirmPassword"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Confirm Password
+            </label>
+            <input
+              id="confirmPassword"
+              required
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+          </div>
+          <button
+            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            type="submit"
+          >
+            Register
+          </button>
+        </form>
+        <button
+          className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 mt-4"
+          type="button"
+          onClick={handleGoogleSignIn}
+        >
+          Sign in with Google
+        </button>
+      </div>
+    </div>
   );
 };
+
+export default RegisterPage;
