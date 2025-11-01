@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from "react";
 import {
@@ -17,13 +17,13 @@ import { Input } from "@heroui/input";
 import { link as linkStyles } from "@heroui/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { SearchIcon, Logo } from "@/components/icons";
 
 // ✅ Firebase imports
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app } from "@/firebase/firebase"; // adjust if your firebase file is in another path
 
 export const Navbar = () => {
@@ -35,6 +35,7 @@ export const Navbar = () => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
     });
+
     return () => unsubscribe();
   }, []);
 

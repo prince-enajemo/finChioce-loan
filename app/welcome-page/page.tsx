@@ -77,7 +77,8 @@ const WelcomePage = () => {
             initial={{ opacity: 0 }}
             transition={{ delay: 1 }}
           >
-            Trusted by over <span className="text-yellow-400 font-semibold">50,000</span> South
+            Trusted by over{" "}
+            <span className="text-yellow-400 font-semibold">50,000</span> South
             Africans nationwide.
           </motion.p>
         </div>

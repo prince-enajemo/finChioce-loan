@@ -2,10 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth, firestore } from "@/firebase/firebase";
+import {
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import Link from "next/link";
+
+import { auth, firestore } from "@/firebase/firebase";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -22,7 +27,7 @@ const LoginPage = () => {
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
-        password
+        password,
       );
       const user = userCredential.user;
 
@@ -39,6 +44,7 @@ const LoginPage = () => {
 
         // Check if user document exists in Firestore
         const userDoc = await getDoc(doc(firestore, "users", user.uid));
+
         if (!userDoc.exists()) {
           // Save user document after email verification
           await setDoc(doc(firestore, "users", user.uid), {
@@ -56,14 +62,19 @@ const LoginPage = () => {
     } catch (error) {
       if (error instanceof Error) {
         const errorMessage = error.message;
+
         if (errorMessage.includes("user-not-found")) {
           setError("No account found with this email. Please register first.");
         } else if (errorMessage.includes("account-does-not-exist")) {
-          setError("The account does not exist. Please check your email or register.");
+          setError(
+            "The account does not exist. Please check your email or register.",
+          );
         } else if (errorMessage.includes("wrong-password")) {
           setError("Incorrect password. Please try again.");
         } else if (errorMessage.includes("invalid-credentials")) {
-          setError("Invalid credentials. Please check your email and password.");
+          setError(
+            "Invalid credentials. Please check your email and password.",
+          );
         } else if (errorMessage.includes("too-many-requests")) {
           setError("Too many login attempts. Please try again later.");
         } else if (errorMessage.includes("invalid-auth")) {
@@ -97,35 +108,49 @@ const LoginPage = () => {
   return (
     <div className="bg-gradient-to-b from-gray-600 to-black flex justify-center items-center h-screen w-full overflow-hidden">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">Login</h2>
+        <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
+          Login
+        </h2>
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-        {message && <p className="text-green-500 text-center mb-4">{message}</p>}
-        <form onSubmit={handleLogin} className="space-y-6">
+        {message && (
+          <p className="text-green-500 text-center mb-4">{message}</p>
+        )}
+        <form className="space-y-6" onSubmit={handleLogin}>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+            <label
+              className="block text-sm font-medium text-gray-700"
+              htmlFor="email"
+            >
+              Email
+            </label>
             <input
+              required
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+            <label
+              className="block text-sm font-medium text-gray-700"
+              htmlFor="password"
+            >
+              Password
+            </label>
             <input
+              required
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
             />
           </div>
           <button
-            type="submit"
             className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            type="submit"
           >
             Login
           </button>
@@ -138,7 +163,10 @@ const LoginPage = () => {
           Sign in with Google
         </button>
         <p className="text-center text-sm text-gray-600 mt-4">
-          Don&apos;t have an account? <Link href="/register" className="text-blue-500 hover:underline">Register</Link>
+          Don&apos;t have an account?{" "}
+          <Link className="text-blue-500 hover:underline" href="/register">
+            Register
+          </Link>
         </p>
       </div>
     </div>

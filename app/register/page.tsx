@@ -15,17 +15,21 @@ import { Kbd } from "@heroui/kbd";
 import { Link } from "@heroui/link";
 import { Input } from "@heroui/input";
 import { link as linkStyles } from "@heroui/theme";
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+} from "@heroui/dropdown";
 import NextLink from "next/link";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { SearchIcon, Logo } from "@/components/icons";
-
-import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
 import { firestore, app } from "@/firebase/firebase";
 
 export const Navbar = () => {
@@ -47,6 +51,7 @@ export const Navbar = () => {
 
           if (userDoc.exists()) {
             const userData = userDoc.data();
+
             setFirstName(userData.firstName || null);
           } else {
             setFirstName(null);
@@ -65,6 +70,7 @@ export const Navbar = () => {
 
   const handleLogout = async () => {
     const auth = getAuth(app);
+
     await signOut(auth);
     router.push("/"); // Redirect to home after logout
   };
@@ -138,14 +144,19 @@ export const Navbar = () => {
                   className="text-sm font-bold text-default-600 bg-default-100"
                   variant="flat"
                 >
-                  Hi, {firstName || user.displayName || user.email?.split("@")[0]} ▾
+                  Hi,{" "}
+                  {firstName || user.displayName || user.email?.split("@")[0]} ▾
                 </Button>
               </DropdownTrigger>
               <DropdownMenu aria-label="User menu">
                 <DropdownItem key="profile">
                   <NextLink href="/dashboard">Profile</NextLink>
                 </DropdownItem>
-                <DropdownItem key="logout" color="danger" onPress={handleLogout}>
+                <DropdownItem
+                  key="logout"
+                  color="danger"
+                  onPress={handleLogout}
+                >
                   Logout
                 </DropdownItem>
               </DropdownMenu>
@@ -193,9 +204,9 @@ export const Navbar = () => {
           {user && (
             <NavbarMenuItem>
               <Button
+                className="w-full"
                 color="danger"
                 variant="flat"
-                className="w-full"
                 onPress={handleLogout}
               >
                 Logout
