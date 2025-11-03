@@ -9,6 +9,7 @@ import {
 } from "firebase/auth";
 
 import { auth } from "@/firebase/firebase";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const PasswordChangePage = () => {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -16,16 +17,18 @@ const PasswordChangePage = () => {
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handlePasswordChange = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
     setMessage(null);
+    setLoading(true);
 
     if (newPassword !== confirmNewPassword) {
       setError("New passwords do not match");
-
+      setLoading(false);
       return;
     }
 
@@ -53,8 +56,14 @@ const PasswordChangePage = () => {
       } else {
         setError("An unknown error occurred");
       }
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">

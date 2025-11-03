@@ -13,6 +13,12 @@ const config = {
         sans: ["var(--font-sans)"],
         mono: ["var(--font-mono)"],
       },
+      colors: {
+        white: "#FFFFFF",
+        darkBlue: "#0A2540", // your dark blue
+        magenta: "#FF00FF",  // your magenta
+        lightBlue: "#00CFFF", // your light blue
+      },
     },
   },
   darkMode: "class",

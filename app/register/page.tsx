@@ -11,8 +11,11 @@ import {
 } from "firebase/auth";
 
 import { auth } from "@/firebase/firebase";
+import useAuthRedirect from "@/hooks/useAuthRedirect";
 
 const RegisterPage = () => {
+  useAuthRedirect();
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [gender, setGender] = useState("");

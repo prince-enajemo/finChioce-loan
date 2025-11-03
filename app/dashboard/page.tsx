@@ -8,6 +8,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 
 import { auth, firestore } from "@/firebase/firebase";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -50,11 +51,7 @@ const Dashboard = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Loading...</p>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
