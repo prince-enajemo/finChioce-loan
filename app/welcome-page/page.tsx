@@ -22,10 +22,10 @@ const WelcomePage = () => {
       {/* Hero Section */}
       <section
         className="relative h-screen flex items-center justify-center overflow-hidden bg-cover bg-center"
-        style={{
-          backgroundImage:
-            'url("https://i.pinimg.com/736x/d3/d5/24/d3d524fa1eadee6075b8a6c893e02e49.jpg")',
-        }}
+        // style={{
+        //   backgroundImage:
+        //     'url("https://i.pinimg.com/736x/d3/d5/24/d3d524fa1eadee6075b8a6c893e02e49.jpg")',
+        // }}
       >
         {/* Dark overlay */}
         <div className="absolute inset-0 bg-black/70 z-0"></div>
@@ -163,7 +163,7 @@ const WelcomePage = () => {
             {
               name: "Lerato M.",
               review: "Transparent and reliable service. Thank you!",
-              rating: 5,
+              rating: 5,  
             },
           ].map((review, index) => (
             <motion.div
